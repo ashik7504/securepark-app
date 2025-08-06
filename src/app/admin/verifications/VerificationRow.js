@@ -1,9 +1,10 @@
+// src/app/admin/verifications/VerificationRow.js
 'use client';
 
 import { useState } from 'react';
-import { getSignedDocumentUrls, approveRequest, rejectRequest } from './actions';
+// ❗️ REMOVE the direct import from './actions'
 
-export default function VerificationRow({ request }) {
+export default function VerificationRow({ request, getSignedDocumentUrls, approveRequest, rejectRequest }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleViewDocuments = async () => {
@@ -21,8 +22,12 @@ export default function VerificationRow({ request }) {
 
   const handleApprove = async () => {
     setIsLoading(true);
-    await approveRequest(request.id, request.user_id);
-    setIsLoading(false);
+    try {
+      await approveRequest(request.id, request.user_id);
+    } catch (error) {
+      alert(error.message);
+    }
+    // No need to setIsLoading(false) because the page will refresh
   };
 
   return (
@@ -33,10 +38,12 @@ export default function VerificationRow({ request }) {
       </div>
       <div className="md:col-span-3 flex flex-wrap items-center justify-end gap-2">
         <button onClick={handleViewDocuments} disabled={isLoading} className="btn-secondary">View Documents</button>
-        <form action={rejectRequest} className="flex gap-2">
-          <input type="hidden" name="requestId" value={request.id} />
-          <input type="text" name="reason" placeholder="Rejection reason (optional)" className="input-sm" />
-          <button type="submit" disabled={isLoading} className="btn-danger">Reject</button>
+        <form action={rejectRequest}>
+          <div className="flex gap-2">
+            <input type="hidden" name="requestId" value={request.id} />
+            <input type="text" name="reason" placeholder="Rejection reason (optional)" className="input-sm" />
+            <button type="submit" disabled={isLoading} className="btn-danger">Reject</button>
+          </div>
         </form>
         <button onClick={handleApprove} disabled={isLoading} className="btn-primary">Approve</button>
       </div>

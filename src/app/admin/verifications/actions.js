@@ -1,20 +1,15 @@
 // src/app/admin/verifications/actions.js
 'use server';
-
-import { createServerClient } from '@supabase/ssr';
+'use server';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import createSupabaseServerClient from '@/lib/supabase/server';
 
-// This is the function for viewing documents, no changes needed here.
-export async function getSignedDocumentUrls(filePaths) {
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    { cookies: { getAll: () => cookies().getAll() } }
-  );
-  const { data, error } = await supabase.storage
-    .from('verification-documents')
-    .createSignedUrls(filePaths, 60);
+export async function submitReview(formData) {
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (error) throw new Error('Could not get document URLs.');
   return data;

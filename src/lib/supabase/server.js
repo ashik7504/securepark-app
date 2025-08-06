@@ -1,9 +1,7 @@
+// src/lib/supabase/server.js
 import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 
-export default function createSupabaseServerClient() {
-  const cookieStore = cookies();
-
+export default function createSupabaseServerClient(cookieStore) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

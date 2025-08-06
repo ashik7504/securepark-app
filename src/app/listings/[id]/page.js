@@ -1,13 +1,15 @@
+// src/app/listings/[id]/page.js
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import BookingForm from '@/components/BookingForm';
 
-// This tells Next.js to re-fetch this page on every request.
 export const dynamic = 'force-dynamic';
 
 export default async function ListingDetailPage({ params }) {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   // Fetch the specific listing by its ID
   const { data: listing, error } = await supabase

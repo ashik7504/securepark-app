@@ -2,10 +2,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 
 export async function toggleListingStatus(listingId, currentStatus) {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   const {
     data: { user },
@@ -19,12 +21,12 @@ export async function toggleListingStatus(listingId, currentStatus) {
     .from('listings')
     .update({ is_active: !currentStatus })
     .eq('id', listingId)
-    .eq('host_id', user.id); // Double-check ownership
+    .eq('host_id', user.id);
 
   if (error) {
     console.error('Error updating listing status:', error);
     throw new Error('Failed to update listing status.');
   }
 
-  revalidatePath('/dashboard'); // Refresh the dashboard data
+  revalidatePath('/dashboard');
 }

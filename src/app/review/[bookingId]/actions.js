@@ -1,12 +1,13 @@
 // src/app/review/[bookingId]/actions.js
 'use server';
-
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 
 export async function submitReview(formData) {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('You must be logged in.');

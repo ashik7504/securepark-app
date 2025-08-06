@@ -1,4 +1,5 @@
 // src/app/payment/[bookingId]/page.js
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 import { processPayment } from './actions';
@@ -6,7 +7,8 @@ import { processPayment } from './actions';
 export const dynamic = 'force-dynamic';
 
 export default async function PaymentPage({ params }) {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   
   const { data: { user } } = await supabase.auth.getUser();
 

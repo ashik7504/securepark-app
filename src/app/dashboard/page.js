@@ -1,3 +1,5 @@
+// src/app/dashboard/page.js
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -7,7 +9,8 @@ import HostListingRow from '@/components/HostListingRow';
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   
   const { data: { user } } = await supabase.auth.getUser();
 

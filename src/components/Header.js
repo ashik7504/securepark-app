@@ -1,9 +1,12 @@
+// src/components/Header.js
 import Link from 'next/link';
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 import { logout } from '@/app/auth/actions';
 
 export default async function Header() {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
   return (

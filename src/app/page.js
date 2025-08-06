@@ -1,10 +1,13 @@
+// src/app/page.js
+import { cookies } from 'next/headers';
 import createSupabaseServerClient from '@/lib/supabase/server';
 import ListingCard from '@/components/ListingCard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   const { data: listings, error } = await supabase
     .from('listings')

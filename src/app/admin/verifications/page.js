@@ -2,26 +2,28 @@
 import createSupabaseServerClient from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import VerificationRow from './VerificationRow';
+import { cookies } from 'next/headers';
+
+// 👇 Import the actions here in the server component 👇
+import { getSignedDocumentUrls, approveRequest, rejectRequest } from './actions';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminVerificationPage() {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch user profile to check for admin status
   const { data: profile } = await supabase
     .from('profiles')
     .select('is_admin')
     .eq('id', user?.id)
     .single();
-
-  // Protect the route - only admins can access
+  
   if (!profile?.is_admin) {
     notFound();
   }
 
-  // Fetch all pending verification requests
   const { data: requests } = await supabase
     .from('verification_requests')
     .select('*, profiles(full_name)')
@@ -32,7 +34,16 @@ export default async function AdminVerificationPage() {
       <h1 className="text-3xl font-bold mb-6">Admin - Host Verifications</h1>
       <div className="space-y-4">
         {requests && requests.length > 0 ? (
-          requests.map(req => <VerificationRow key={req.id} request={req} />)
+          requests.map(req => (
+            // 👇 Pass the actions down as props here 👇
+            <VerificationRow
+              key={req.id}
+              request={req}
+              getSignedDocumentUrls={getSignedDocumentUrls}
+              approveRequest={approveRequest}
+              rejectRequest={rejectRequest}
+            />
+          ))
         ) : (
           <p>No pending verification requests.</p>
         )}

@@ -1,3 +1,5 @@
+// src/app/review/[bookingId]/page.js
+import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { submitReview } from './actions';
 import createSupabaseServerClient from '@/lib/supabase/server';
@@ -5,7 +7,8 @@ import createSupabaseServerClient from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export default async function ReviewPage({ params }) {
-  const supabase = createSupabaseServerClient();
+  const cookieStore = cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth');
 
